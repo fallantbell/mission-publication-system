@@ -15,20 +15,239 @@ ADDR=(HOST,PORT)
 
 lobbychoose=1 # 0=lobby 1=delegate 2=pickup  
 username="username"
+m_list=["aaa","bbb","ccc","ccc","ccc","ccc","ccc","ccc","ccc","ccc"]
+
+name="username"
+missionname="missionname"
+destination="destination"
+deadline="deadline"
+salary="salary"
+content="content"+'\n'+"hahah"
+
+# def listenthread():
+#     global m_list,name,missionname,destination,deadline,salary,content
+#     global lobbychoose
+#     while True:
+#         x=clientsocket.recv(1024).decode() 
+#         if x[0]=="entryaccept":
+#             deleteuserentrylayout()
+#             setlobbychooselayout()
+#         elif x[0]=="mission":
+#             if x[1]=="read":  # 載入任務列表
+#                 m_list=[]
+#                 for i in range(2,len(x)):
+#                     m_list.append(x[i])
+#                 setmissionlist()
+#             elif x[1]=="detail": # 查看任務
+#                 missionname=x[2]
+#                 destination=x[3]
+#                 deadline=x[4]
+#                 salary=x[5]
+#                 content=x[6]
+#                 delete_lobby_right()
+#                 deletelobbychooselayout()
+#                 if lobbychoose==0: # 接收任務
+#                     set_ready_pickup_layout()
+#                 elif lobbychoose==1: # 查看發布的任務 新增按鈕complete 若已經complete 設enable=false
+#                     pass
+#                 elif lobbychoose==2: # 查看接收的任務 新增狀態 complete incomplete
+#                     pass
+
+                
+
+
+def deletemissionsample(): # 刪除樣板
+    global mission_content_lb,mission_missionname_lb,mission_money_lb,mission_place_lb,mission_time_lb,mission_user_lb 
+    global mission_canvas
+    mission_content_lb.place_forget()
+    mission_missionname_lb.place_forget()
+    mission_money_lb.place_forget()
+    mission_place_lb.place_forget()
+    mission_time_lb.place_forget()
+    mission_user_lb.place_forget()
+
+    mission_canvas.place_forget()
+
+def setmissionsample(): #任務樣板
+    global mission_content_lb,mission_missionname_lb,mission_money_lb,mission_place_lb,mission_time_lb,mission_user_lb 
+    global mission_canvas
+    mission_canvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
+    mission_canvas.place(x=0,y=0)
+
+    mission_user_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="發佈人:")
+    mission_user_lb.place(x=20,y=70)
+    mission_missionname_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務名稱:")
+    mission_missionname_lb.place(x=20,y=120)
+    mission_place_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務地點:")
+    mission_place_lb.place(x=20,y=170)
+    mission_time_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="時間:")
+    mission_time_lb.place(x=20,y=220)
+    mission_money_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="酬勞:")
+    mission_money_lb.place(x=20,y=270)
+    mission_content_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務內容:")
+    mission_content_lb.place(x=20,y=320)
+
+
+def setmissioninfo(): # 顯示任務詳細資訊
+    global missioninfo_content_lb,missioninfo_missionname_lb,missioninfo_money_lb,missioninfo_place_lb,missioninfo_time_lb,missioninfo_user_lb 
+    global name,missionname,destination,deadline,salary,content
+    missioninfo_user_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=name)
+    missioninfo_user_lb.place(x=130,y=70)
+    missioninfo_missionname_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=missionname)
+    missioninfo_missionname_lb.place(x=130,y=120)
+    missioninfo_place_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=destination)
+    missioninfo_place_lb.place(x=130,y=170)
+    missioninfo_time_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=deadline)
+    missioninfo_time_lb.place(x=130,y=220)
+    missioninfo_money_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=salary)
+    missioninfo_money_lb.place(x=130,y=270)
+    missioninfo_content_lb=tk.Label(window,font="微軟正黑體 16 bold",justify="left",bg="NavajoWhite",text=content)
+    missioninfo_content_lb.place(x=20,y=370)
+
+def deletemissioninfo(): # 刪除任務資訊
+    global missioninfo_missionname_lb,missioninfo_money_lb,missioninfo_place_lb,missioninfo_time_lb,missioninfo_user_lb 
+    missioninfo_missionname_lb.place_forget()
+    missioninfo_money_lb.place_forget()
+    missioninfo_place_lb.place_forget()
+    missioninfo_time_lb.place_forget()
+    missioninfo_user_lb .place_forget()
+
+
+
+
+def already_pickuptolobby(): # 已經接的任務 => 大廳(已經接的任務列表)
+    delete_already_pickup_layout()
+    setlobbychooselayout(2)
+
+def delete_already_pickup_layout(): # 刪除已經接取任務介面
+    global already_pickup_backbt
+    deletemissionsample()
+    deletemissioninfo()
+
+    already_pickup_backbt.place_forget()
+
+
+def set_already_pickup_layout(): # 已經接取任務的資訊的介面
+    global already_pickup_backbt,already_pickup_backimg
+    setmissionsample() #任務樣板
+    setmissioninfo() # 任務資訊
+
+    already_pickup_backimg=tk.PhotoImage(file="image/back.png")
+    already_pickup_backbt=tk.Button(window,image=already_pickup_backimg,relief="flat",bd=0,width=100,height=50,command=already_pickuptolobby)
+    already_pickup_backbt.place(x=18,y=15)
+
+
+
+def already_delegatetolobby(): # 已經發的任務 => 大廳(已經發的任務列表)
+    delete_already_delegate_layout()
+    setlobbychooselayout(1)
+
+def delete_already_delegate_layout(): # 刪除已經發布任務介面
+    global already_delegate_backbt,already_delegate_completebt
+    deletemissionsample()
+    deletemissioninfo()
+
+    already_delegate_completebt.place_forget()
+    already_delegate_backbt.place_forget()
+
+def mission_complete(): # 完成任務
+    global already_delegate_completebt,missionname
+    already_delegate_completebt["state"]=tk.DISABLED
+    msg="mission complete "+missionname
+    print("client -> server: "+msg)
+    # clientsocket.send(msg.encode())
+
+def set_already_delegate_layout(): # 已經發布任務的資訊的介面
+    global already_delegate_backbt,already_delegate_backimg,already_delegate_completebt,already_delegate_completeimg
+    setmissionsample() #任務樣板
+    setmissioninfo() # 任務資訊
+
+    already_delegate_backimg=tk.PhotoImage(file="image/back.png")
+    already_delegate_backbt=tk.Button(window,image=already_delegate_backimg,relief="flat",bd=0,width=100,height=50,command=already_delegatetolobby)
+    already_delegate_backbt.place(x=18,y=15)
+
+    already_delegate_completeimg=tk.PhotoImage(file="image/mission_completeimg.png")
+    already_delegate_completebt=tk.Button(window,image=already_delegate_completeimg,relief="flat",bd=0,width=240,height=45,command=mission_complete)
+    already_delegate_completebt.place(x=175,y=650)
+
+
+
+
+def ready_pickuptolobby(): # 準備接任務 => 大廳
+    delete_ready_pickup_layout()
+    setlobbychooselayout(0)
+
+
+def mission_get(): # 接取任務
+    global missionname
+    msg="mission get "+missionname
+    print("client -> server: "+msg)
+    # clientsocket.send(msg.encode())
+    ready_pickuptolobby()
+
+def set_ready_pickup_layout(): # 建立 使用者準備接任務 介面
+    global ready_pickup_backbt,ready_pickup_backimg,ready_pickup_pickupbt,ready_pickup_pickupimg
+    setmissionsample() #任務樣板
+    setmissioninfo() # 任務資訊
+
+    ready_pickup_backimg=tk.PhotoImage(file="image/back.png")
+    ready_pickup_backbt=tk.Button(window,image=ready_pickup_backimg,relief="flat",bd=0,width=100,height=50,command=ready_pickuptolobby)
+    ready_pickup_backbt.place(x=18,y=15)
+
+    ready_pickup_pickupimg=tk.PhotoImage(file="image/pickupimg.png")
+    ready_pickup_pickupbt=tk.Button(window,image=ready_pickup_pickupimg,relief="flat",bd=0,width=240,height=50,command=mission_get)
+    ready_pickup_pickupbt.place(x=175,y=650)
+
+
+
+def delete_ready_pickup_layout():# 刪除 使用者準備接任務 介面
+    global ready_pickup_backbt,ready_pickup_pickupbt
+    deletemissionsample()
+    deletemissioninfo()
+    ready_pickup_backbt.place_forget()
+    ready_pickup_pickupbt.place_forget()
+
+
+
 
 def sendmission(): #使用者發布任務
     ## 送資料到server
+    global user_delegate_missionname,user_delegate_money,user_delegate_place,user_delegate_time
+    flag=False
+    user_delegate_content=user_delegate_content_text.get(1.0, tk.END+"-1c")
+    if user_delegate_missionname.get()=="":
+        print("mission name cannt be empty")
+        flag=True
+    if user_delegate_money.get()=="":
+        print("money cannt be empty")
+        flag=True
+    if user_delegate_place.get()=="":
+        print("place cannt be empty")
+        flag=True
+    if user_delegate_time.get()=="":
+        print("time cannt be empty")
+        flag=True
+    if user_delegate_content=="":
+        print("content cannt be empty")
+        flag=True
+
+    if flag==True: # 資料不完整
+        return 
+    msg="mission create "+user_delegate_missionname.get()+" "+user_delegate_place.get()+" "+user_delegate_time.get()+" "+user_delegate_money.get()+" "+user_delegate_content
+    # clientsocket.send(msg.encode())
+    print("client -> server: "+msg)
     delegatetolobby()
 
 def delegatetolobby(): # 發布任務介面返回大聽
     delete_user_delegate_layout()
-    setlobbychooselayout()
+    setlobbychooselayout(0)
 
 def delete_user_delegate_layout(): # 刪除發布任務介面
-    global user_delegate_content_lb,user_delegate_missionname_lb,user_delegate_money_lb,user_delegate_place_lb,user_delegate_time_lb,user_delegate_user_lb   
+    # global user_delegate_content_lb,user_delegate_missionname_lb,user_delegate_money_lb,user_delegate_place_lb,user_delegate_time_lb,user_delegate_user_lb   
     global user_delegate_content_text,user_delegate_missionname_entry,user_delegate_money_entry,user_delegate_place_entry,user_delegate_time_entry
     global user_delegate_content,user_delegate_missionname,user_delegate_money,user_delegate_place,user_delegate_time
     global user_delegate_canvas,username,user_delegate_backimg,userdelegate_backbt,userdelegate_sendbt
+    global user_delegate_user_lb
 
     user_delegate_content.set("")
     user_delegate_missionname.set("")
@@ -36,12 +255,13 @@ def delete_user_delegate_layout(): # 刪除發布任務介面
     user_delegate_place.set("")
     user_delegate_time.set("")
 
+    deletemissionsample()
     user_delegate_user_lb.place_forget()
-    user_delegate_content_lb.place_forget()
-    user_delegate_missionname_lb.place_forget()
-    user_delegate_money_lb.place_forget()
-    user_delegate_place_lb.place_forget()
-    user_delegate_time_lb.place_forget()
+    # user_delegate_content_lb.place_forget()
+    # user_delegate_missionname_lb.place_forget()
+    # user_delegate_money_lb.place_forget()
+    # user_delegate_place_lb.place_forget()
+    # user_delegate_time_lb.place_forget()
 
     user_delegate_content_text.place_forget()
     user_delegate_missionname_entry.place_forget()
@@ -50,30 +270,33 @@ def delete_user_delegate_layout(): # 刪除發布任務介面
     user_delegate_time_entry.place_forget()
 
     userdelegate_backbt.place_forget()
-    user_delegate_canvas.place_forget()
+    # user_delegate_canvas.place_forget()
     userdelegate_sendbt.place_forget()
 
 
 def set_user_delegate_layout(): # 建立發布任務介面
-    global user_delegate_content_lb,user_delegate_missionname_lb,user_delegate_money_lb,user_delegate_place_lb,user_delegate_time_lb,user_delegate_user_lb   
+    # global user_delegate_content_lb,user_delegate_missionname_lb,user_delegate_money_lb,user_delegate_place_lb,user_delegate_time_lb,   
+    global user_delegate_user_lb
     global user_delegate_content_text,user_delegate_missionname_entry,user_delegate_money_entry,user_delegate_place_entry,user_delegate_time_entry
     global user_delegate_content,user_delegate_missionname,user_delegate_money,user_delegate_place,user_delegate_time
     global user_delegate_canvas,username,user_delegate_backimg,userdelegate_backbt,userdelegate_sendbt,user_delegate_sendimg
-    user_delegate_canvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
-    user_delegate_canvas.place(x=0,y=0)
+    # user_delegate_canvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
+    # user_delegate_canvas.place(x=0,y=0)
 
-    user_delegate_user_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="發佈人:"+username)
-    user_delegate_user_lb.place(x=20,y=70)
-    user_delegate_missionname_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務名稱:")
-    user_delegate_missionname_lb.place(x=20,y=120)
-    user_delegate_place_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務地點:")
-    user_delegate_place_lb.place(x=20,y=170)
-    user_delegate_time_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="時間:")
-    user_delegate_time_lb.place(x=20,y=220)
-    user_delegate_money_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="酬勞:")
-    user_delegate_money_lb.place(x=20,y=270)
-    user_delegate_content_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務內容:")
-    user_delegate_content_lb.place(x=20,y=320)
+    user_delegate_user_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=username)
+    user_delegate_user_lb.place(x=130,y=70)
+    # user_delegate_missionname_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務名稱:")
+    # user_delegate_missionname_lb.place(x=20,y=120)
+    # user_delegate_place_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務地點:")
+    # user_delegate_place_lb.place(x=20,y=170)
+    # user_delegate_time_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="時間:")
+    # user_delegate_time_lb.place(x=20,y=220)
+    # user_delegate_money_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="酬勞:")
+    # user_delegate_money_lb.place(x=20,y=270)
+    # user_delegate_content_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務內容:")
+    # user_delegate_content_lb.place(x=20,y=320)
+
+    setmissionsample()
 
     user_delegate_missionname_entry=tk.Entry(window,font="微軟正黑體 16 bold",bd=1,width=25,textvariable=user_delegate_missionname)
     user_delegate_missionname_entry.place(x=130,y=125)
@@ -121,6 +344,7 @@ def delete_lobby_right(): #刪除大廳右側的layout
         deletepickup()
 
 def lobbyexit(): # 離開 回到登入介面
+    delete_lobby_right()
     deletelobbychooselayout()
     setuserentrylayout()
 
@@ -128,6 +352,7 @@ def deletepickup(): # 刪除接收的任務介面
     global pickup_canvas,pickup_title_label
     pickup_canvas.place_forget()
     pickup_title_label.place_forget()
+    delmissionlist()
 
 def createpickup(): # 設置接收的任務介面
     global lobbychoose,lobby_choose_pickupimg,lobby_choose_pickupbt
@@ -149,12 +374,16 @@ def createpickup(): # 設置接收的任務介面
 
     pickup_title_label=tk.Label(window,font="微軟正黑體 16 bold",relief="ridge",bd=2,width=31,height=4,fg="white",bg="cornflowerblue",text="接收的任務")
     pickup_title_label.place(x=200,y=0)
+
+    loadmission()  #載入任務
+    # setmissionlist()
     
 
 def deletedelegate(): #刪除發布的任務介面
     global delegate_canvas,delegate_title_label
     delegate_canvas.place_forget()
     delegate_title_label.place_forget()
+    delmissionlist()
 
 def createdelegate(): # 設置發布的任務介面
     global lobbychoose,lobby_choose_delegateimg,lobby_choose_delegatebt
@@ -178,11 +407,74 @@ def createdelegate(): # 設置發布的任務介面
     delegate_title_label=tk.Label(window,font="微軟正黑體 16 bold",relief="ridge",bd=2,width=31,height=4,fg="white",bg="cornflowerblue",text="發布的任務")
     delegate_title_label.place(x=200,y=0)
 
+    loadmission()  #載入任務
+    # setmissionlist()
+
+def missiondetail(name): # 查看任務
+    msg="mission detail "+name
+    delete_lobby_right()
+    deletelobbychooselayout()
+    if lobbychoose==0: # 接收任務
+        set_ready_pickup_layout()
+    elif lobbychoose==1: # 查看發布的任務 新增按鈕complete 若已經complete 設enable=false
+        set_already_delegate_layout()
+    elif lobbychoose==2: # 查看接收的任務 新增狀態 complete incomplete
+        set_already_pickup_layout()
+    # clientsocket.send(msg.encode())
+    print("client -> server: "+msg)
+
+
+def addmission(): # 任務列表
+    global m_list,missionframe2
+    for i in range(len(m_list)):
+        tk.Button(missionframe2,font="微軟正黑體 16 bold",activebackground="lightgrey",justify="left",text="任務名稱: "+m_list[i],width=29,height=5,command=lambda name=m_list[i]:missiondetail(name)).grid(row=i,column=0)
+
+def myfunction(event): 
+    global missioncanvas,lobbychoose
+    if lobbychoose==0:
+        missioncanvas.configure(scrollregion=missioncanvas.bbox("all"),width=380,height=520)
+    else:
+        missioncanvas.configure(scrollregion=missioncanvas.bbox("all"),width=380,height=620)
+    
+def on_mousewheel(event): # 控制滑鼠滾輪
+    global missioncanvas
+    scroll = -1 if event.delta > 0 else 1 
+    missioncanvas.yview_scroll(scroll, "units") 
+
+def setmissionlist(): #設置任務列表
+    global missionlist,missionbar,missionframe,m_list,missioncanvas,missionframe2
+    missionframe=tk.Frame(window,relief="flat",bd=1,bg="black",width=400,height=530)
+    missionframe.place(x=200,y=100)
+    
+    missioncanvas=tk.Canvas(missionframe)
+    missionframe2=tk.Frame(missioncanvas,bg="black",width=400,height=530)
+    missionbar=tk.Scrollbar(missionframe,orient="vertical",command=missioncanvas.yview)
+    missioncanvas.configure(yscrollcommand=missionbar.set)
+
+    missionbar.pack(side="right",fill="y")
+    missioncanvas.pack(side="left")
+    missioncanvas.create_window((0,0),window=missionframe2,anchor='nw')
+    missionframe2.bind("<Configure>",myfunction)
+    missioncanvas.bind_all("<MouseWheel>", on_mousewheel)
+    addmission()
+
+def delmissionlist():
+    global missionlist,missionbar,missionframe,missionframe2
+    missionframe.place_forget()
+
+def loadmission(): # 載入任務
+    global lobbychoose      # 根據不同的畫面 和server 要求不同的任務列表 
+    msg="mission read"
+    print("client -> server: "+msg)
+    setmissionlist()
+    # clientsocket.send(msg.encode())
+
 def deletelobby(): # 刪除任務大廳介面
     global lobby_canvs,lobby_delegatebt,lobby_title_label
     lobby_canvs.place_forget()
     lobby_title_label.place_forget()
     lobby_delegatebt.place_forget()
+    delmissionlist()
 
 def createlobby(): # 設置任務大廳介面
     global lobby_choose_lobbyimg,lobbychoose,lobby_choose_lobbybt
@@ -208,6 +500,8 @@ def createlobby(): # 設置任務大廳介面
     lobby_title_label=tk.Label(window,font="微軟正黑體 16 bold",relief="ridge",bd=2,width=31,height=4,fg="white",bg="cornflowerblue",text="任務大廳")
     lobby_title_label.place(x=200,y=0)
 
+    loadmission()  #載入任務
+    # setmissionlist()
 
 def deletelobbychooselayout(): # 清除大廳左邊選擇欄
     global lobby_choose_canvas,lobby_choose_delegatebt,lobby_choose_exit,lobby_choose_lobbybt,lobby_choose_pickupbt
@@ -217,25 +511,30 @@ def deletelobbychooselayout(): # 清除大廳左邊選擇欄
     lobby_choose_lobbybt.place_forget()
     lobby_choose_pickupbt.place_forget()
 
-def setlobbychooselayout():  # 設置大廳左邊選擇欄
+def setlobbychooselayout(number):  # 設置大廳左邊選擇欄
     global lobby_choose_canvas,lobby_choose_delegatebt,lobby_choose_exit,lobby_choose_lobbybt,lobby_choose_pickupbt,lobby_choose_pickupimg,lobby_choose_lobbyimg,lobby_choose_exitimg,lobby_choose_delegateimg
     global lobbychoose
     lobby_choose_canvas=tk.Canvas(width=200,height=700,bg="seagreen")
     lobby_choose_canvas.place(x=0,y=0)
 
     init_lobby_choose_color()
-    lobbychoose=1
-    createlobby()
+    lobbychoose=-1
+    if number==0:
+        createlobby()
+    elif number==1:
+        createdelegate()
+    elif number==2:
+        createpickup()
 
-    lobby_choose_lobbyimg=tk.PhotoImage(file="image/lobby_choose_lobbyimg_red.png")
+    # lobby_choose_lobbyimg=tk.PhotoImage(file="image/lobby_choose_lobbyimg_red.png")
     lobby_choose_lobbybt=tk.Button(window,image=lobby_choose_lobbyimg,bd=0,width=200,height=100,command=createlobby)
     lobby_choose_lobbybt.place(x=0,y=200)
 
-    lobby_choose_delegateimg=tk.PhotoImage(file="image/lobby_choose_delegateimg.png")
+    # lobby_choose_delegateimg=tk.PhotoImage(file="image/lobby_choose_delegateimg.png")
     lobby_choose_delegatebt=tk.Button(window,image=lobby_choose_delegateimg,bd=0,width=200,height=100,command=createdelegate)
     lobby_choose_delegatebt.place(x=0,y=300)
 
-    lobby_choose_pickupimg=tk.PhotoImage(file="image/lobby_choose_pickupimg.png")
+    # lobby_choose_pickupimg=tk.PhotoImage(file="image/lobby_choose_pickupimg.png")
     lobby_choose_pickupbt=tk.Button(window,image=lobby_choose_pickupimg,bd=0,width=200,height=100,command=createpickup)
     lobby_choose_pickupbt.place(x=0,y=400)
 
@@ -284,64 +583,84 @@ def registback(): # 返回登入畫面
     setuserentrylayout()
 
 def regist(): #註冊
-    global registname,registpass
+    global registname,registpass,registuser
+
     if registname.get()=="":
-        print("username cannt be empty!!")
+        print("account cannt be empty!!")
         # registerror.set("username cannt be empty!!")
         # registerrorlabel.place(x=300,y=420)
     elif registpass.get()=="":
         print("password cannt be empty!!")
         # registerror.set("password cannt be empty!!")
         # registerrorlabel.place(x=300,y=420)
+    elif registuser.get()=="":
+        print("username cannt be empty!!")
     else:
-        msg="regist "+registname.get()+" "+registpass.get()
-        registname.set("")
-        registpass.set("")
+        msg="regist "+registuser.get()+" "+registname.get()+" "+registpass.get()
+        deletregistlayout()
+        setuserentrylayout()
+        print("client -> server: "+msg)
         # clientsocket.send(msg.encode())                  # <========================= 向server 傳遞註冊資料
 
 def deletregistlayout(): #清除註冊介面
-    global registcanvas,registnameentry,registpassentry,registbackbutton,registbutton
+    global registcanvas,registnameentry,registpassentry,registbackbutton,registbutton,registname,registpass,registuserentry,registuser
     registcanvas.place_forget()
     registnameentry.place_forget()
+    registuserentry.place_forget()
     registpassentry.place_forget()
     registbackbutton.place_forget()
     registbutton.place_forget()
 
-# def setregistlayout(): # 設置註冊介面
-#     global registcanvas,registnameimg,registpassimg,registnameentry,registpassentry,registbackbutton,registbutton
+    registname.set("")
+    registpass.set("")
+    
+    registuser.set("")
 
-#     registcanvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
-#     registcanvas.place(x=0,y=0)
+def setregistlayout(): # 設置註冊介面
+    global registcanvas,registnameimg,registpassimg,registnameentry,registpassentry,registbackbutton,registbutton,registbackimg,registconfirmimg
+    global registuserimg,registuserentry,registuser,registtitleimg
 
-#     registnameimg=tk.PhotoImage(file="image/userimg.png")
-#     registcanvas.create_image(128,345,image=registnameimg)
-#     registpassimg=tk.PhotoImage(file="image/passimg.png")
-#     registcanvas.create_image(130,420,image=registpassimg)
+    registcanvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
+    registcanvas.place(x=0,y=0)
 
-#     registnameentry=tk.Entry(window,font="微軟正黑體 16 bold",bd=3,width=20,textvariable=registname)
-#     registnameentry.place(x=190,y=327,height=30)
-#     registpassentry=tk.Entry(window,font="微軟正黑體 16 bold",bd=3,width=20,textvariable=registpass)
-#     registpassentry.place(x=190,y=407,height=30)
+    registtitleimg=tk.PhotoImage(file="image/registtitleimg.png")
+    registcanvas.create_image(270,130,image=registtitleimg)
 
-#     registbackbutton=tk.Button(window,text="返回",command = registback)
-#     registbackbutton.place(x=180,y=470)
-#     registbutton=tk.Button(window,text="確認",command = regist)
-#     registbutton.place(x=260,y=470)
+    registuserimg=tk.PhotoImage(file="image/registuserimg.png")
+    registcanvas.create_image(128,270,image=registuserimg)
+    registnameimg=tk.PhotoImage(file="image/userimg.png")
+    registcanvas.create_image(128,345,image=registnameimg)
+    registpassimg=tk.PhotoImage(file="image/passimg.png")
+    registcanvas.create_image(130,420,image=registpassimg)
+
+    registuserentry=tk.Entry(window,font="微軟正黑體 16 bold",bd=3,width=20,textvariable=registuser)
+    registuserentry.place(x=190,y=255,height=30)
+    registnameentry=tk.Entry(window,font="微軟正黑體 16 bold",bd=3,width=20,textvariable=registname)
+    registnameentry.place(x=190,y=327,height=30)
+    registpassentry=tk.Entry(window,font="微軟正黑體 16 bold",bd=3,width=20,textvariable=registpass)
+    registpassentry.place(x=190,y=407,height=30)
+
+    registbackimg=tk.PhotoImage(file="image/registbackimg.png")
+    registbackbutton=tk.Button(window,image=registbackimg,relief="flat",bd=0,width=100,height=48,command = registback)
+    registbackbutton.place(x=180,y=455)
+
+    registconfirmimg=tk.PhotoImage(file="image/registconfirmimg.png")
+    registbutton=tk.Button(window,image=registconfirmimg,relief="flat",bd=0,width=100,height=48,command = regist)
+    registbutton.place(x=320,y=455)
 
 
 def enter(): # 登入
     global entername,enterpass
-    # setsetnamelayout()
-    setlobbychooselayout()
-    deleteuserentrylayout()
+    
     if entername.get()=="":
         print("username cannt be empty!")
     elif enterpass.get()=="":
         print("password cannt be empty!")
     else:
-        msg="account "+entername.get()+" "+enterpass.get()
-        entername.set("")
-        enterpass.set("")
+        msg="account signin "+entername.get()+" "+enterpass.get()
+        setlobbychooselayout(0)
+        deleteuserentrylayout()
+        print("client -> server: "+msg)
         # clientsocket.send(msg.encode())   #<================================ 向server 傳遞登入資料
 
 def enterregist(): # 進入註冊畫面
@@ -375,12 +694,14 @@ def setuserentrylayout(): # 設置登入介面
     usrregistbutton.place(x=310,y=453)
 
 def deleteuserentrylayout(): # 清除登入介面
-    global entry_canvas,usrnameentrybutton,usrregistbutton,usrpassentry,usrnameentry
+    global entry_canvas,usrnameentrybutton,usrregistbutton,usrpassentry,usrnameentry,entername,enterpass
     entry_canvas.place_forget()
     usrnameentrybutton.place_forget()
     usrregistbutton.place_forget()
     usrpassentry.place_forget()
     usrnameentry.place_forget()
+    entername.set("")
+    enterpass.set("")
 
 window=tk.Tk()
 window.geometry('600x700')
@@ -405,25 +726,31 @@ enterpass=tk.StringVar()
 
 #註冊介面宣告
 registcanvas=tk.Canvas()
+registtitleimg=tk.PhotoImage()
 registnameimg=tk.PhotoImage()
 registpassimg=tk.PhotoImage()
+registuserimg=tk.PhotoImage()
 registnameentry=tk.Entry()
 registpassentry=tk.Entry()
+registuserentry=tk.Entry()
 registbackbutton=tk.Button()
 registbutton=tk.Button()
+registbackimg=tk.PhotoImage()
+registconfirmimg=tk.PhotoImage()
 
+registuser=tk.StringVar()
 registname=tk.StringVar()
 registpass=tk.StringVar()
 
 
 #設定暱稱宣告
-setnamecanvas=tk.Canvas()
-setnametitleimg=tk.PhotoImage()
-setnameimg=tk.PhotoImage()
-setnameentry=tk.Entry()
-setnamebt=tk.Button()
+# setnamecanvas=tk.Canvas()
+# setnametitleimg=tk.PhotoImage()
+# setnameimg=tk.PhotoImage()
+# setnameentry=tk.Entry()
+# setnamebt=tk.Button()
 
-setname=tk.StringVar()
+# setname=tk.StringVar()
 
 #大廳選單宣告
 lobby_choose_canvas=tk.Canvas()
@@ -441,6 +768,11 @@ lobby_choose_exitimg=tk.PhotoImage()
 lobby_canvs=tk.Canvas()
 lobby_delegatebt=tk.Button()
 lobby_title_label=tk.Label()
+missionframe=tk.Frame()
+missionframe2=tk.Frame()
+missionlist=tk.Listbox()
+missionbar=tk.Scrollbar()
+missioncanvas=tk.Canvas()
 
 #發布的任務宣告
 delegate_canvas=tk.Canvas()
@@ -451,15 +783,41 @@ delegate_title_label=tk.Label()
 pickup_canvas=tk.Canvas()
 pickup_title_label=tk.Label()
 
-#發布任務需告
-user_delegate_canvas=tk.Canvas()
-user_delegate_user_lb=tk.Label()
-user_delegate_missionname_lb=tk.Label()
-user_delegate_place_lb=tk.Label()
-user_delegate_time_lb=tk.Label()
-user_delegate_money_lb=tk.Label()
-user_delegate_content_lb=tk.Label()
 
+#任務樣板宣告
+mission_canvas=tk.Canvas()
+mission_user_lb=tk.Label()
+mission_missionname_lb=tk.Label()
+mission_place_lb=tk.Label()
+mission_time_lb=tk.Label()
+mission_money_lb=tk.Label()
+mission_content_lb=tk.Label()
+
+#任務資訊宣告
+missioninfo_user_lb=tk.Label()
+missioninfo_missionname_lb=tk.Label()
+missioninfo_place_lb=tk.Label()
+missioninfo_time_lb=tk.Label()
+missioninfo_money_lb=tk.Label()
+missioninfo_content_lb=tk.Label()
+
+#準備接取任務宣告
+ready_pickup_backimg=tk.PhotoImage()
+ready_pickup_backbt=tk.Button()
+ready_pickup_pickupimg=tk.PhotoImage()
+ready_pickup_pickupbt=tk.Button()
+
+#已經發布任務介面宣告
+already_delegate_backimg=tk.PhotoImage()
+already_delegate_backbt=tk.Button()
+already_delegate_completeimg=tk.PhotoImage()
+already_delegate_completebt=tk.Button()
+
+#已經接取任務介面宣告
+already_pickup_backbt=tk.Button()
+already_pickup_backimg=tk.PhotoImage()
+
+#發布任務需告
 user_delegate_user_entry=tk.Entry()
 user_delegate_missionname_entry=tk.Entry()
 user_delegate_place_entry=tk.Entry()
@@ -480,6 +838,9 @@ userdelegate_sendbt=tk.Button()
 
 #進入登入介面
 setuserentrylayout()
+
+# thread = threading.Thread(target=listenthread)
+# thread.start()
 
 def onclose():
     # clientsocket.send(DISCONNECT_MESSAGE.encode())
