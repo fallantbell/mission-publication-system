@@ -173,7 +173,7 @@ def mission_complete(): # 完成任務
     already_delegate_completebt["state"]=tk.DISABLED
     msg="mission complete "+missionname
     print("client -> server: "+msg)
-    # clientsocket.send(msg.encode())
+    clientsocket.send(msg.encode())
 
 def set_already_delegate_layout(): # 已經發布任務的資訊的介面
     global already_delegate_backbt,already_delegate_backimg,already_delegate_completebt,already_delegate_completeimg
@@ -200,7 +200,7 @@ def mission_get(): # 接取任務
     global missionname
     msg="mission get "+missionname
     print("client -> server: "+msg)
-    # clientsocket.send(msg.encode())
+    clientsocket.send(msg.encode('Big5'))
     ready_pickuptolobby()
 
 def set_ready_pickup_layout(): # 建立 使用者準備接任務 介面
@@ -255,7 +255,7 @@ def sendmission(): #使用者發布任務
     if flag==True: # 資料不完整
         return 
     msg="mission create "+user_delegate_missionname.get()+" "+user_delegate_place.get()+" "+user_delegate_time.get()+" "+user_delegate_money.get()+" "+user_delegate_content
-    # clientsocket.send(msg.encode())
+    clientsocket.send(msg.encode('Big5'))
     print("client -> server: "+msg)
     delegatetolobby()
 
@@ -381,7 +381,7 @@ def refresh(): # 刷新任務
         msg="mission search get"
 
     # delmissionlist()
-    # clientsocket.send(msg.encode('Big5'))
+    clientsocket.send(msg.encode('Big5'))
     print(f"client -> server: {msg}")
 
 def deletepickup(): # 刪除接收的任務介面
@@ -407,7 +407,7 @@ def createpickup(): # 設置接收的任務介面
 
     # 設置接收的任務介面
 
-    pickup_canvas=tk.Canvas(width=400,height=700,bg="blue")
+    pickup_canvas=tk.Canvas(width=400,height=700,bg="gainsboro")
     pickup_canvas.place(x=200,y=0)
 
     pickup_title_label=tk.Label(window,font="微軟正黑體 16 bold",relief="ridge",bd=2,width=31,height=4,fg="white",bg="cornflowerblue",text="接收的任務")
@@ -444,7 +444,7 @@ def createdelegate(): # 設置發布的任務介面
     lobby_choose_delegatebt["image"]=lobby_choose_delegateimg
 
     # 設置發布的任務介面
-    delegate_canvas=tk.Canvas(width=400,height=700,bg="red")
+    delegate_canvas=tk.Canvas(width=400,height=700,bg="gainsboro")
     delegate_canvas.place(x=200,y=0)
 
     delegate_title_label=tk.Label(window,font="微軟正黑體 16 bold",relief="ridge",bd=2,width=31,height=4,fg="white",bg="cornflowerblue",text="發布的任務")
@@ -467,7 +467,7 @@ def missiondetail(name): # 查看任務
         set_already_delegate_layout()
     elif lobbychoose==2: # 查看接收的任務 新增狀態 complete incomplete
         set_already_pickup_layout()
-    # clientsocket.send(msg.encode())
+    clientsocket.send(msg.encode('Big5'))
     print("client -> server: "+msg)
 
 
@@ -520,8 +520,8 @@ def loadmission(): # 載入任務
         msg="mission search get"
     
     print("client -> server: "+msg)
-    setmissionlist()
-    # clientsocket.send(msg.encode())
+    # setmissionlist()
+    clientsocket.send(msg.encode('Big5'))
 
 def deletelobby(): # 刪除任務大廳介面
     global lobby_canvs,lobby_delegatebt,lobby_title_label,refreshbt
@@ -574,9 +574,12 @@ def deletelobbychooselayout(): # 清除大廳左邊選擇欄
 
 def setlobbychooselayout(number):  # 設置大廳左邊選擇欄
     global lobby_choose_canvas,lobby_choose_delegatebt,lobby_choose_exit,lobby_choose_lobbybt,lobby_choose_pickupbt,lobby_choose_pickupimg,lobby_choose_lobbyimg,lobby_choose_exitimg,lobby_choose_delegateimg
-    global lobbychoose,lobby_choose_username,username
+    global lobbychoose,lobby_choose_username,username,iconimg
     lobby_choose_canvas=tk.Canvas(width=200,height=700,bg="seagreen")
     lobby_choose_canvas.place(x=0,y=0)
+
+    iconimg=tk.PhotoImage(file="image/iconimg.png")
+    lobby_choose_canvas.create_image(100,75,image=iconimg)
 
     lobby_choose_username=tk.Label(window,font="微軟正黑體 16 bold",bg="yellow",width=15,text=username)
     lobby_choose_username.place(x=0,y=155)
@@ -788,6 +791,7 @@ lobby_choose_delegateimg=tk.PhotoImage()
 lobby_choose_pickupimg=tk.PhotoImage()
 lobby_choose_exitimg=tk.PhotoImage()
 
+iconimg=tk.PhotoImage()
 
 refreshbt=tk.Button()
 refreshimg=tk.PhotoImage()
