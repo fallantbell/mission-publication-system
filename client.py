@@ -38,7 +38,7 @@ def listenthread():
                     deletregistlayout()
                     setuserentrylayout() # 註冊畫面 => 大廳
                 elif x[2]=="fail": # 失敗
-                    errormsg.place_forget
+                    errormsg.place_forget()
                     errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="regist fail!")
                     errormsg.place(x=180,y=520)
             elif x[1]=="signin": # 登入
@@ -47,7 +47,7 @@ def listenthread():
                     deleteuserentrylayout()
                     setlobbychooselayout(0)  # 登入畫面 => 大廳
                 elif x[2]=="fail": # 失敗
-                    errormsg.place_forget
+                    errormsg.place_forget()
                     errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="sign in fail!")
                     errormsg.place(x=180,y=520)
         elif x[0]=="mission":
@@ -71,6 +71,14 @@ def listenthread():
                     set_already_delegate_layout()
                 elif lobbychoose==2: # 查看接收的任務 
                     set_already_pickup_layout()
+            elif x[1]=="get":
+                if x[2]=="success":
+                    ready_pickuptolobby()
+                elif x[2]=="fail":
+                    errormsg.place_forget()
+                    errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="任務已被接取")
+                    errormsg.place(x=450,y=660)
+
 
                 
 
@@ -202,7 +210,7 @@ def mission_get(): # 接取任務
     msg="mission get "+missionname
     print("client -> server: "+msg)
     clientsocket.send(msg.encode('Big5'))
-    ready_pickuptolobby()
+    # ready_pickuptolobby()
 
 def set_ready_pickup_layout(): # 建立 使用者準備接任務 介面
     global ready_pickup_backbt,ready_pickup_backimg,ready_pickup_pickupbt,ready_pickup_pickupimg
