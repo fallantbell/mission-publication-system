@@ -497,7 +497,7 @@ def setmissionlist(): #設置任務列表
     missionframe=tk.Frame(window,relief="flat",bd=1,bg="lightgrey",width=400,height=530)
     missionframe.place(x=200,y=100)
     
-    missioncanvas=tk.Canvas(missionframe)
+    missioncanvas=tk.Canvas(missionframe,bg="lightgrey")
     missionframe2=tk.Frame(missioncanvas,bg="lightgrey",width=400,height=530)
     missionbar=tk.Scrollbar(missionframe,orient="vertical",command=missioncanvas.yview)
     missioncanvas.configure(yscrollcommand=missionbar.set)
