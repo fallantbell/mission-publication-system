@@ -62,6 +62,7 @@ def listenthread():
                 deadline=x[4]
                 salary=x[5]
                 content=x[6].replace("_"," ")
+                content=content.replace("=",'\n')
                 delete_lobby_right()
                 deletelobbychooselayout()
                 if lobbychoose==0: # 接收任務 新增按鈕get
@@ -234,6 +235,7 @@ def sendmission(): #使用者發布任務
     flag=False
     user_delegate_content=user_delegate_content_text.get(1.0, tk.END+"-1c")
     user_delegate_content=user_delegate_content.replace(" ","_")
+    user_delegate_content=user_delegate_content.replace('\n',"=")
     errormsg.place_forget()
     errormsg=tk.Label(window,bg="NavajoWhite",fg="red",text="can not be empty!")
     if user_delegate_missionname.get()=="":
@@ -490,11 +492,11 @@ def on_mousewheel(event): # 控制滑鼠滾輪
 
 def setmissionlist(): #設置任務列表
     global missionlist,missionbar,missionframe,m_list,missioncanvas,missionframe2
-    missionframe=tk.Frame(window,relief="flat",bd=1,bg="black",width=400,height=530)
+    missionframe=tk.Frame(window,relief="flat",bd=1,bg="lightgrey",width=400,height=530)
     missionframe.place(x=200,y=100)
     
     missioncanvas=tk.Canvas(missionframe)
-    missionframe2=tk.Frame(missioncanvas,bg="black",width=400,height=530)
+    missionframe2=tk.Frame(missioncanvas,bg="lightgrey",width=400,height=530)
     missionbar=tk.Scrollbar(missionframe,orient="vertical",command=missioncanvas.yview)
     missioncanvas.configure(yscrollcommand=missionbar.set)
 
