@@ -306,8 +306,7 @@ def set_user_delegate_layout(): # 建立發布任務介面
     # user_delegate_canvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
     # user_delegate_canvas.place(x=0,y=0)
 
-    user_delegate_user_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=username)
-    user_delegate_user_lb.place(x=130,y=70)
+    
     # user_delegate_missionname_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務名稱:")
     # user_delegate_missionname_lb.place(x=20,y=120)
     # user_delegate_place_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text="任務地點:")
@@ -320,6 +319,9 @@ def set_user_delegate_layout(): # 建立發布任務介面
     # user_delegate_content_lb.place(x=20,y=320)
 
     setmissionsample()
+
+    user_delegate_user_lb=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",text=username)
+    user_delegate_user_lb.place(x=130,y=70)
 
     user_delegate_missionname_entry=tk.Entry(window,font="微軟正黑體 16 bold",bd=1,width=25,textvariable=user_delegate_missionname)
     user_delegate_missionname_entry.place(x=130,y=125)
