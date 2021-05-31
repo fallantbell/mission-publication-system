@@ -57,11 +57,12 @@ def listenthread():
                     m_list.append(x[i])
                 setmissionlist()
             elif x[1]=="detail": # 查看任務
-                missionname=x[2]
-                destination=x[3]
-                deadline=x[4]
-                salary=x[5]
-                content=x[6].replace("_"," ")
+                name=x[2]
+                missionname=x[3]
+                destination=x[4]
+                deadline=x[5]
+                salary=x[6]
+                content=x[7].replace("_"," ")
                 content=content.replace("=",'\n')
                 delete_lobby_right()
                 deletelobbychooselayout()
@@ -78,6 +79,9 @@ def listenthread():
                     errormsg.place_forget()
                     errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="任務已被接取")
                     errormsg.place(x=450,y=660)
+            elif x[1]=="mission":
+                if x[2]=="complete":
+                    already_pickuptolobby()
 
 
                 
@@ -147,15 +151,16 @@ def already_pickuptolobby(): # 已經接的任務 => 大廳(已經接的任務�
     setlobbychooselayout(2)
 
 def delete_already_pickup_layout(): # 刪除已經接取任務介面
-    global already_pickup_backbt
+    global already_pickup_backbt,already_pickup_completebt
     deletemissionsample()
     deletemissioninfo()
 
+    already_pickup_completebt.place_forget()
     already_pickup_backbt.place_forget()
 
 
 def set_already_pickup_layout(): # 已經接取任務的資訊的介面
-    global already_pickup_backbt,already_pickup_backimg
+    global already_pickup_backbt,already_pickup_backimg,already_pickup_completebt,already_pickup_completeimg
     setmissionsample() #任務樣板
     setmissioninfo() # 任務資訊
 
@@ -163,29 +168,30 @@ def set_already_pickup_layout(): # 已經接取任務的資訊的介面
     already_pickup_backbt=tk.Button(window,image=already_pickup_backimg,relief="flat",bd=0,width=100,height=50,command=already_pickuptolobby)
     already_pickup_backbt.place(x=18,y=15)
 
+    already_pickup_completeimg=tk.PhotoImage(file="image/mission_completeimg.png")
+    already_pickup_completebt=tk.Button(window,image=already_delegate_completeimg,relief="flat",bd=0,width=240,height=45,command=mission_complete)
+    already_pickup_completebt.place(x=175,y=650)
 
 
-def already_delegatetolobby(): # 已經發的任務 => 大廳(已經發的任務列表)
-    delete_already_delegate_layout()
-    setlobbychooselayout(1)
+def already_pickuptolobby(): # 已經發的任務 => 大廳(已經發的任務列表)
+    delete_already_pickup_layout()
+    setlobbychooselayout(2)
 
 def delete_already_delegate_layout(): # 刪除已經發布任務介面
-    global already_delegate_backbt,already_delegate_completebt
+    global already_delegate_backbt
     deletemissionsample()
     deletemissioninfo()
 
-    already_delegate_completebt.place_forget()
     already_delegate_backbt.place_forget()
 
 def mission_complete(): # 完成任務
-    global already_delegate_completebt,missionname
-    already_delegate_completebt["state"]=tk.DISABLED
+    global missionname
     msg="mission complete "+missionname
     print("client -> server: "+msg)
     clientsocket.send(msg.encode())
 
 def set_already_delegate_layout(): # 已經發布任務的資訊的介面
-    global already_delegate_backbt,already_delegate_backimg,already_delegate_completebt,already_delegate_completeimg
+    global already_delegate_backbt,already_delegate_backimg
     setmissionsample() #任務樣板
     setmissioninfo() # 任務資訊
 
@@ -193,9 +199,6 @@ def set_already_delegate_layout(): # 已經發布任務的資訊的介面
     already_delegate_backbt=tk.Button(window,image=already_delegate_backimg,relief="flat",bd=0,width=100,height=50,command=already_delegatetolobby)
     already_delegate_backbt.place(x=18,y=15)
 
-    already_delegate_completeimg=tk.PhotoImage(file="image/mission_completeimg.png")
-    already_delegate_completebt=tk.Button(window,image=already_delegate_completeimg,relief="flat",bd=0,width=240,height=45,command=mission_complete)
-    already_delegate_completebt.place(x=175,y=650)
 
 
 
@@ -206,8 +209,8 @@ def ready_pickuptolobby(): # 準備接任務 => 大廳
 
 
 def mission_get(): # 接取任務
-    global missionname,name,errormsg
-    if name=="username":
+    global missionname,name,errormsg,username
+    if name==username:
         errormsg.place_forget()
         errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="無法接取")
         errormsg.place(x=460,y=660)
