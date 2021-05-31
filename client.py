@@ -206,7 +206,12 @@ def ready_pickuptolobby(): # 準備接任務 => 大廳
 
 
 def mission_get(): # 接取任務
-    global missionname
+    global missionname,name,errormsg
+    if name=="username":
+        errormsg.place_forget()
+        errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="無法接取")
+        errormsg.place(x=460,y=660)
+        return 
     msg="mission get "+missionname
     print("client -> server: "+msg)
     clientsocket.send(msg.encode('Big5'))
