@@ -6,7 +6,7 @@ import time
 
 
 HOST="127.0.0.1"
-PORT=8080
+PORT=8000
 DISCONNECT_MESSAGE="disconnect"
 ADDR=(HOST,PORT)
 
@@ -24,10 +24,14 @@ deadline="deadline"
 salary="salary"
 content="content"+'\n'+"hahah"
 
+like_hate=0
+likenum="+50"
+hatenum="-60"
+
 def listenthread():
     global m_list,name,missionname,destination,deadline,salary,content
     global lobbychoose,errormsg
-    global username
+    global username,likenum,hatenum
     while True:
         x=clientsocket.recv(1024).decode('Big5') 
         x=x.split(" ")
@@ -44,6 +48,8 @@ def listenthread():
             elif x[1]=="signin": # 登入
                 if x[2]=="success": # 成功
                     username=x[3]
+                    likenum="+"+str(abs(int(x[4])))
+                    hatenum="-"+str(abs(int(x[5])))
                     deleteuserentrylayout()
                     setlobbychooselayout(0)  # 登入畫面 => 大廳
                 elif x[2]=="fail": # 失敗
@@ -57,20 +63,23 @@ def listenthread():
                     m_list.append(x[i])
                 setmissionlist()
             elif x[1]=="detail": # 查看任務
-                name=x[2]
-                missionname=x[3]
-                destination=x[4]
-                deadline=x[5]
-                salary=x[6]
-                content=x[7].replace("_"," ")
+                name=x[3]
+                missionname=x[4]
+                destination=x[5]
+                deadline=x[6]
+                salary=x[7]
+                content=x[8].replace("_"," ")
                 content=content.replace("=",'\n')
                 delete_lobby_right()
                 deletelobbychooselayout()
                 if lobbychoose==0: # 接收任務 新增按鈕get
                     set_ready_pickup_layout()
-                elif lobbychoose==1: # 查看發布的任務 新增按鈕complete 
-                    set_already_delegate_layout()
-                elif lobbychoose==2: # 查看接收的任務 
+                elif lobbychoose==1: # 查看發布的任務 
+                    if x[2]=="scorable":
+                        set_already_delegate_layout(1)
+                    else:
+                        set_already_delegate_layout(0)
+                elif lobbychoose==2: # 查看接收的任務 新增按鈕complete 
                     set_already_pickup_layout()
             elif x[1]=="get":
                 if x[2]=="success":
@@ -79,9 +88,12 @@ def listenthread():
                     errormsg.place_forget()
                     errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="任務已被接取")
                     errormsg.place(x=450,y=660)
-            elif x[1]=="mission":
-                if x[2]=="complete":
-                    already_pickuptolobby()
+            elif x[1]=="complete":
+                already_pickuptolobby()
+            elif x[1]=="score":
+                if x[2]=="success":
+                    already_delegatetolobby()
+                
 
 
                 
@@ -169,29 +181,69 @@ def set_already_pickup_layout(): # 已經接取任務的資訊的介面
     already_pickup_backbt.place(x=18,y=15)
 
     already_pickup_completeimg=tk.PhotoImage(file="image/mission_completeimg.png")
-    already_pickup_completebt=tk.Button(window,image=already_delegate_completeimg,relief="flat",bd=0,width=240,height=45,command=mission_complete)
+    already_pickup_completebt=tk.Button(window,image=already_pickup_completeimg,relief="flat",bd=0,width=240,height=45,command=mission_complete)
     already_pickup_completebt.place(x=175,y=650)
 
 
-def already_pickuptolobby(): # 已經發的任務 => 大廳(已經發的任務列表)
-    delete_already_pickup_layout()
-    setlobbychooselayout(2)
+def already_delegatetolobby(): # 已經發的任務 => 大廳(已經發的任務列表)
+    delete_already_delegate_layout()
+    setlobbychooselayout(1)
 
 def delete_already_delegate_layout(): # 刪除已經發布任務介面
-    global already_delegate_backbt
+    global already_delegate_backbt,already_delegate_likebt,already_delegate_hatebt,already_delegate_scorebt
     deletemissionsample()
     deletemissioninfo()
-
     already_delegate_backbt.place_forget()
+    already_delegate_likebt.place_forget()
+    already_delegate_scorebt.place_forget()
+    already_delegate_hatebt.place_forget()
 
 def mission_complete(): # 完成任務
     global missionname
     msg="mission complete "+missionname
     print("client -> server: "+msg)
-    clientsocket.send(msg.encode())
+    clientsocket.send(msg.encode("Big5"))
 
-def set_already_delegate_layout(): # 已經發布任務的資訊的介面
-    global already_delegate_backbt,already_delegate_backimg
+def like():
+    global already_delegate_likeimg,already_delegate_likebt,already_delegate_hatebt,already_delegate_hateimg
+    global like_hate
+
+    already_delegate_likeimg=tk.PhotoImage(file="image/like_greenimg.png")
+    already_delegate_likebt["image"]=already_delegate_likeimg
+
+    already_delegate_hateimg=tk.PhotoImage(file="image/hate_blackimg.png")
+    already_delegate_hatebt["image"]=already_delegate_hateimg
+
+    like_hate=1
+
+def hate():
+    global already_delegate_likeimg,already_delegate_likebt,already_delegate_hatebt,already_delegate_hateimg
+    global like_hate
+
+    already_delegate_likeimg=tk.PhotoImage(file="image/like_blackimg.png")
+    already_delegate_likebt["image"]=already_delegate_likeimg
+
+    already_delegate_hateimg=tk.PhotoImage(file="image/hate_redimg.png")
+    already_delegate_hatebt["image"]=already_delegate_hateimg
+
+    like_hate=-1
+
+def score():
+    global errormsg,like_hate,missionname
+    if like_hate==0:
+        errormsg.place_forget()
+        errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="尚未評分")
+        errormsg.place(x=460,y=630)
+        return
+    msg="mission score "+missionname+" "+str(like_hate)
+    print(f"client -> server: "+msg)
+    clientsocket.send(msg.encode("Big5"))
+    # already_delegatetolobby()
+
+def set_already_delegate_layout(scorable): # 已經發布任務的資訊的介面
+    global already_delegate_backbt,already_delegate_backimg,already_delegate_likeimg,already_delegate_likebt,already_delegate_hatebt,already_delegate_hateimg
+    global already_delegate_scorebt,already_delegate_scoreimg,like_hate
+    
     setmissionsample() #任務樣板
     setmissioninfo() # 任務資訊
 
@@ -199,7 +251,21 @@ def set_already_delegate_layout(): # 已經發布任務的資訊的介面
     already_delegate_backbt=tk.Button(window,image=already_delegate_backimg,relief="flat",bd=0,width=100,height=50,command=already_delegatetolobby)
     already_delegate_backbt.place(x=18,y=15)
 
+    if scorable==0:
+        return
+        
+    like_hate=0
+    already_delegate_likeimg=tk.PhotoImage(file="image/like_blackimg.png") # 讚
+    already_delegate_likebt=tk.Button(window,image=already_delegate_likeimg,relief="flat",bd=0,width=85,height=85,command=like)
+    already_delegate_likebt.place(x=220,y=520)
 
+    already_delegate_hateimg=tk.PhotoImage(file="image/hate_blackimg.png") # 倒讚
+    already_delegate_hatebt=tk.Button(window,image=already_delegate_hateimg,relief="flat",bd=0,width=85,height=85,command=hate)
+    already_delegate_hatebt.place(x=320,y=520)
+
+    already_delegate_scoreimg=tk.PhotoImage(file="image/scoreimg.png") # 評分按鈕
+    already_delegate_scorebt=tk.Button(window,image=already_delegate_scoreimg,relief="flat",bd=0,width=150,height=40,command=score)
+    already_delegate_scorebt.place(x=240,y=620)
 
 
 
@@ -479,14 +545,14 @@ def createdelegate(): # 設置發布的任務介面
 
 def missiondetail(name): # 查看任務
     msg="mission detail "+name
-    delete_lobby_right()
-    deletelobbychooselayout()
-    if lobbychoose==0: # 接收任務
-        set_ready_pickup_layout()
-    elif lobbychoose==1: # 查看發布的任務 新增按鈕complete 若已經complete 設enable=false
-        set_already_delegate_layout()
-    elif lobbychoose==2: # 查看接收的任務 新增狀態 complete incomplete
-        set_already_pickup_layout()
+    # delete_lobby_right()
+    # deletelobbychooselayout()
+    # if lobbychoose==0: # 接收任務
+    #     set_ready_pickup_layout()
+    # elif lobbychoose==1: # 查看發布的任務 新增按鈕complete 若已經complete 設enable=false
+    #     set_already_delegate_layout()
+    # elif lobbychoose==2: # 查看接收的任務 新增狀態 complete incomplete
+    #     set_already_pickup_layout()
     clientsocket.send(msg.encode('Big5'))
     print("client -> server: "+msg)
 
@@ -595,14 +661,25 @@ def deletelobbychooselayout(): # 清除大廳左邊選擇欄
 def setlobbychooselayout(number):  # 設置大廳左邊選擇欄
     global lobby_choose_canvas,lobby_choose_delegatebt,lobby_choose_exit,lobby_choose_lobbybt,lobby_choose_pickupbt,lobby_choose_pickupimg,lobby_choose_lobbyimg,lobby_choose_exitimg,lobby_choose_delegateimg
     global lobbychoose,lobby_choose_username,username,iconimg
+    global lobby_choose_hate,lobby_choose_like,lobby_choose_seperate,likenum,hatenum
+
     lobby_choose_canvas=tk.Canvas(width=200,height=700,bg="seagreen")
     lobby_choose_canvas.place(x=0,y=0)
 
     iconimg=tk.PhotoImage(file="image/iconimg.png")
     lobby_choose_canvas.create_image(100,75,image=iconimg)
 
+    lobby_choose_like=tk.Label(window,font="微軟正黑體 20 bold",fg="springgreen",bg="seagreen",width=3,text=likenum)
+    lobby_choose_like.place(x=30,y=170)
+
+    lobby_choose_hate=tk.Label(window,font="微軟正黑體 20 bold",fg="red",bg="seagreen",width=3,text=hatenum)
+    lobby_choose_hate.place(x=110,y=170)
+
+    lobby_choose_seperate=tk.Label(window,font="微軟正黑體 20 bold",fg="black",bg="seagreen",width=1,text="/")
+    lobby_choose_seperate.place(x=90,y=170)
+
     lobby_choose_username=tk.Label(window,font="微軟正黑體 16 bold",bg="yellow",width=15,text=username)
-    lobby_choose_username.place(x=0,y=155)
+    lobby_choose_username.place(x=0,y=255)
 
     init_lobby_choose_color()
     lobbychoose=-1
@@ -615,15 +692,15 @@ def setlobbychooselayout(number):  # 設置大廳左邊選擇欄
 
     # lobby_choose_lobbyimg=tk.PhotoImage(file="image/lobby_choose_lobbyimg_red.png")
     lobby_choose_lobbybt=tk.Button(window,image=lobby_choose_lobbyimg,bd=0,width=200,height=100,command=createlobby)
-    lobby_choose_lobbybt.place(x=0,y=200)
+    lobby_choose_lobbybt.place(x=0,y=300)
 
     # lobby_choose_delegateimg=tk.PhotoImage(file="image/lobby_choose_delegateimg.png")
     lobby_choose_delegatebt=tk.Button(window,image=lobby_choose_delegateimg,bd=0,width=200,height=100,command=createdelegate)
-    lobby_choose_delegatebt.place(x=0,y=300)
+    lobby_choose_delegatebt.place(x=0,y=400)
 
     # lobby_choose_pickupimg=tk.PhotoImage(file="image/lobby_choose_pickupimg.png")
     lobby_choose_pickupbt=tk.Button(window,image=lobby_choose_pickupimg,bd=0,width=200,height=100,command=createpickup)
-    lobby_choose_pickupbt.place(x=0,y=400)
+    lobby_choose_pickupbt.place(x=0,y=500)
 
     lobby_choose_exitimg=tk.PhotoImage(file="image/lobby_choose_exitimg.png")
     lobby_choose_exit=tk.Button(window,image=lobby_choose_exitimg,bd=0,width=200,height=100,command=lobbyexit)
@@ -805,6 +882,9 @@ lobby_choose_lobbybt=tk.Button()
 lobby_choose_delegatebt=tk.Button()
 lobby_choose_pickupbt=tk.Button()
 lobby_choose_exit=tk.Button()
+lobby_choose_like=tk.Label()
+lobby_choose_hate=tk.Label()
+lobby_choose_seperate=tk.Label
 
 lobby_choose_lobbyimg=tk.PhotoImage()
 lobby_choose_delegateimg=tk.PhotoImage()
@@ -864,6 +944,13 @@ already_delegate_backimg=tk.PhotoImage()
 already_delegate_backbt=tk.Button()
 already_delegate_completeimg=tk.PhotoImage()
 already_delegate_completebt=tk.Button()
+already_delegate_likebt=tk.Button()
+already_delegate_hatebt=tk.Button()
+already_delegate_scorebt=tk.Button()
+already_delegate_likeimg=tk.PhotoImage()
+already_delegate_hateimg=tk.PhotoImage()
+already_delegate_scoreimg=tk.PhotoImage()
+
 
 #已經接取任務介面宣告
 already_pickup_backbt=tk.Button()
