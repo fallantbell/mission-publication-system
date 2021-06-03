@@ -12,6 +12,7 @@ ADDR=(HOST,PORT)
 
 clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM) # <===================建立socket  
 clientsocket.connect(ADDR)
+is_connect=1
 
 lobbychoose=1 # 0=lobby 1=delegate 2=pickup  
 username="username"
@@ -29,70 +30,75 @@ likenum="+50"
 hatenum="-60"
 
 def listenthread():
-    global m_list,name,missionname,destination,deadline,salary,content
+    global m_list,name,missionname,destination,deadline,salary,content,clientsocket
     global lobbychoose,errormsg
     global username,likenum,hatenum
+    global is_connect
     while True:
-        x=clientsocket.recv(1024).decode('Big5') 
-        x=x.split(" ")
-        print(f"msg={x}")
-        if x[0]=="account":
-            if x[1]=="regist":  # 註冊
-                if x[2]=="success": # 成功
-                    deletregistlayout()
-                    setuserentrylayout() # 註冊畫面 => 大廳
-                elif x[2]=="fail": # 失敗
-                    errormsg.place_forget()
-                    errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="regist fail!")
-                    errormsg.place(x=180,y=520)
-            elif x[1]=="signin": # 登入
-                if x[2]=="success": # 成功
-                    username=x[3]
-                    likenum="+"+str(abs(int(x[4])))
-                    hatenum="-"+str(abs(int(x[5])))
-                    deleteuserentrylayout()
-                    setlobbychooselayout(0)  # 登入畫面 => 大廳
-                elif x[2]=="fail": # 失敗
-                    errormsg.place_forget()
-                    errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="sign in fail!")
-                    errormsg.place(x=180,y=520)
-        elif x[0]=="mission":
-            if x[1]=="search":  # 載入任務列表
-                m_list=[]
-                for i in range(2,len(x)):
-                    m_list.append(x[i])
-                setmissionlist()
-            elif x[1]=="detail": # 查看任務
-                name=x[3]
-                missionname=x[4]
-                destination=x[5]
-                deadline=x[6]
-                salary=x[7]
-                content=x[8].replace("_"," ")
-                content=content.replace("=",'\n')
-                delete_lobby_right()
-                deletelobbychooselayout()
-                if lobbychoose==0: # 接收任務 新增按鈕get
-                    set_ready_pickup_layout()
-                elif lobbychoose==1: # 查看發布的任務 
-                    if x[2]=="scorable":
-                        set_already_delegate_layout(1)
-                    else:
-                        set_already_delegate_layout(0)
-                elif lobbychoose==2: # 查看接收的任務 新增按鈕complete 
-                    set_already_pickup_layout()
-            elif x[1]=="get":
-                if x[2]=="success":
-                    ready_pickuptolobby()
-                elif x[2]=="fail":
-                    errormsg.place_forget()
-                    errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="任務已被接取")
-                    errormsg.place(x=450,y=660)
-            elif x[1]=="complete":
-                already_pickuptolobby()
-            elif x[1]=="score":
-                if x[2]=="success":
-                    already_delegatetolobby()
+        try:
+            x=clientsocket.recv(1024).decode('Big5') 
+            x=x.split(" ")
+            print(f"msg={x}")
+            if x[0]=="account":
+                if x[1]=="regist":  # 註冊
+                    if x[2]=="success": # 成功
+                        deletregistlayout()
+                        setuserentrylayout() # 註冊畫面 => 大廳
+                    elif x[2]=="fail": # 失敗
+                        errormsg.place_forget()
+                        errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="regist fail!")
+                        errormsg.place(x=180,y=520)
+                elif x[1]=="signin": # 登入
+                    if x[2]=="success": # 成功
+                        username=x[3]
+                        likenum="+"+str(abs(int(x[4])))
+                        hatenum="-"+str(abs(int(x[5])))
+                        deleteuserentrylayout()
+                        setlobbychooselayout(0)  # 登入畫面 => 大廳
+                    elif x[2]=="fail": # 失敗
+                        errormsg.place_forget()
+                        errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="sign in fail!")
+                        errormsg.place(x=180,y=520)
+            elif x[0]=="mission":
+                if x[1]=="search":  # 載入任務列表
+                    m_list=[]
+                    for i in range(2,len(x)):
+                        m_list.append(x[i])
+                    setmissionlist()
+                elif x[1]=="detail": # 查看任務
+                    name=x[3]
+                    missionname=x[4]
+                    destination=x[5]
+                    deadline=x[6]
+                    salary=x[7]
+                    content=x[8].replace("_"," ")
+                    content=content.replace("=",'\n')
+                    delete_lobby_right()
+                    deletelobbychooselayout()
+                    if lobbychoose==0: # 接收任務 新增按鈕get
+                        set_ready_pickup_layout()
+                    elif lobbychoose==1: # 查看發布的任務 
+                        if x[2]=="scorable":
+                            set_already_delegate_layout(1)
+                        else:
+                            set_already_delegate_layout(0)
+                    elif lobbychoose==2: # 查看接收的任務 新增按鈕complete 
+                        set_already_pickup_layout()
+                elif x[1]=="get":
+                    if x[2]=="success":
+                        ready_pickuptolobby()
+                    elif x[2]=="fail":
+                        errormsg.place_forget()
+                        errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="任務已被接取")
+                        errormsg.place(x=450,y=660)
+                elif x[1]=="complete":
+                    already_pickuptolobby()
+                elif x[1]=="score":
+                    if x[2]=="success":
+                        already_delegatetolobby()
+        except Exception:
+            break
+    print("disconnect")
                 
 
 
@@ -199,7 +205,7 @@ def delete_already_delegate_layout(): # 刪除已經發布任務介面
     already_delegate_hatebt.place_forget()
 
 def mission_complete(): # 完成任務
-    global missionname
+    global missionname,clientsocket
     msg="mission complete "+missionname
     print("client -> server: "+msg)
     clientsocket.send(msg.encode("Big5"))
@@ -229,7 +235,7 @@ def hate():
     like_hate=-1
 
 def score():
-    global errormsg,like_hate,missionname
+    global errormsg,like_hate,missionname,clientsocket
     if like_hate==0:
         errormsg.place_forget()
         errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="尚未評分")
@@ -275,7 +281,7 @@ def ready_pickuptolobby(): # 準備接任務 => 大廳
 
 
 def mission_get(): # 接取任務
-    global missionname,name,errormsg,username
+    global missionname,name,errormsg,username,clientsocket
     if name==username:
         errormsg.place_forget()
         errormsg=tk.Label(window,font="微軟正黑體 16 bold",bg="NavajoWhite",fg="red",text="無法接取")
@@ -313,7 +319,7 @@ def delete_ready_pickup_layout():# 刪除 使用者準備接任務 介面
 
 def sendmission(): #使用者發布任務
     ## 送資料到server
-    global user_delegate_missionname,user_delegate_money,user_delegate_place,user_delegate_time,errormsg
+    global user_delegate_missionname,user_delegate_money,user_delegate_place,user_delegate_time,errormsg,clientsocket
     flag=False
     user_delegate_content=user_delegate_content_text.get(1.0, tk.END+"-1c")
     user_delegate_content=user_delegate_content.replace(" ","_")
@@ -451,13 +457,16 @@ def delete_lobby_right(): #刪除大廳右側的layout
         deletepickup()
 
 def lobbyexit(): # 離開 回到登入介面
+    global is_connect,clientsocket
+    is_connect=0
+    clientsocket.close()
     delete_lobby_right()
     deletelobbychooselayout()
     setuserentrylayout()
 
 
 def refresh(): # 刷新任務
-    global lobbychoose
+    global lobbychoose,clientsocket
     msg=""
     if lobbychoose==0:
         msg="mission search all"
@@ -544,6 +553,7 @@ def createdelegate(): # 設置發布的任務介面
     # setmissionlist()
 
 def missiondetail(name): # 查看任務
+    global clientsocket
     msg="mission detail "+name
     # delete_lobby_right()
     # deletelobbychooselayout()
@@ -596,7 +606,7 @@ def delmissionlist():
     missionframe.place_forget()
 
 def loadmission(): # 載入任務
-    global lobbychoose      # 根據不同的畫面 和server 要求不同的任務列表 
+    global lobbychoose,clientsocket      # 根據不同的畫面 和server 要求不同的任務列表 
     msg=""
     if lobbychoose==0:
         msg="mission search all"
@@ -713,7 +723,7 @@ def registback(): # 返回登入畫面
     setuserentrylayout()
 
 def regist(): #註冊
-    global registname,registpass,registuser,errormsg
+    global registname,registpass,registuser,errormsg,clientsocket
     errormsg.place_forget()
     errormsg=tk.Label(window,bg="NavajoWhite",fg="red",text="can not be empty!")
     if registuser.get()=="":
@@ -777,7 +787,7 @@ def setregistlayout(): # 設置註冊介面
 
 
 def enter(): # 登入
-    global entername,enterpass,errormsg
+    global entername,enterpass,errormsg,clientsocket
     errormsg.place_forget()
     errormsg=tk.Label(window,bg="NavajoWhite",fg="red",text="can not be empty!")
     if entername.get()=="":
@@ -800,6 +810,7 @@ def enterregist(): # 進入註冊畫面
 
 def setuserentrylayout(): # 設置登入介面
     global entry_canvas,entry_title_img,usrnameentrybutton,usrregistbutton,usrpassentry,usrnameentry,usrnameimg,usrpassimg,enterimg,registimg
+    global is_connect,clientsocket
     entry_canvas=tk.Canvas(width=600,height=700,bg="NavajoWhite")
     entry_canvas.place(x=0,y=0)
     entry_title_img=tk.PhotoImage(file="image/titleimage.png")
@@ -822,6 +833,15 @@ def setuserentrylayout(): # 設置登入介面
     usrnameentrybutton.place(x=180,y=455)
     usrregistbutton=tk.Button(window,image=registimg,relief="flat",bd=0,bg="NavajoWhite",highlightbackground="NavajoWhite",width=110,height=45,command = enterregist)
     usrregistbutton.place(x=310,y=453)
+
+    if is_connect==0: # 斷線重連
+        is_connect=1
+        sockettmp=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        clientsocket=sockettmp
+        clientsocket.connect(ADDR)
+        thread = threading.Thread(target=listenthread) # 開啟thread 監聽server
+        thread.start()
+        
 
 def deleteuserentrylayout(): # 清除登入介面
     global entry_canvas,usrnameentrybutton,usrregistbutton,usrpassentry,usrnameentry,entername,enterpass
