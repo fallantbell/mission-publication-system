@@ -3,6 +3,7 @@ import tkinter as tk
 import tkinter.font as tkFont
 import threading
 import time
+from tkinter import ttk
 
 
 HOST="127.0.0.1"
@@ -620,16 +621,32 @@ def loadmission(): # 載入任務
     clientsocket.send(msg.encode('Big5'))
 
 def deletelobby(): # 刪除任務大廳介面
-    global lobby_canvs,lobby_delegatebt,lobby_title_label,refreshbt
+    global lobby_canvs,lobby_delegatebt,lobby_title_label,refreshbt,comboExample,lobby_keyword,lobby_keyword_bt,lobby_keyword_entry
     refreshbt.place_forget()
     lobby_canvs.place_forget()
     lobby_title_label.place_forget()
     lobby_delegatebt.place_forget()
+    comboExample.place_forget()
+    lobby_keyword.set("")
+    lobby_keyword_bt.place_forget()
+    lobby_keyword_entry.place_forget()
     delmissionlist()
+
+def searchkeyword():
+    global comboExample,lobby_keyword,clientsocket
+    msg="mission search keyword "
+    if comboExample.get()=="地點":
+        msg+="destination "
+    elif comboExample.get()=="名稱":
+        msg+="missionname "
+    elif comboExample.get()=="內容":
+        msg+="content "
+    msg+=lobby_keyword.get()
+    print(msg)
 
 def createlobby(): # 設置任務大廳介面
     global lobby_choose_lobbyimg,lobbychoose,lobby_choose_lobbybt,refreshbt,refreshimg
-    global lobby_canvs,lobby_delegatebt,lobby_title_label
+    global lobby_canvs,lobby_delegatebt,lobby_title_label,comboExample,lobby_keyword,lobby_keyword_bt,lobby_keyword_entry
     if lobbychoose==0:
         return
 
@@ -645,7 +662,7 @@ def createlobby(): # 設置任務大廳介面
     lobby_canvs=tk.Canvas(width=400,height=700,bg="gainsboro")
     lobby_canvs.place(x=200,y=0)
 
-    
+
 
     lobby_delegatebt=tk.Button(window,font="微軟正黑體 16 bold",relief="ridge",bd=2,width=30,height=2,activebackground="chocolate",activeforeground="white",fg="white",bg="sandybrown",text="發布任務",command=delegating)
     lobby_delegatebt.place(x=200,y=627)
@@ -656,6 +673,20 @@ def createlobby(): # 設置任務大廳介面
     refreshimg=tk.PhotoImage(file="image/refreshimg.png")
     refreshbt=tk.Button(window,image=refreshimg,relief="flat",bd=0,width=47,height=42,command=refresh)
     refreshbt.place(x=520,y=30)
+
+    comboExample = ttk.Combobox(window, 
+        values=[
+            "名稱", 
+            "地點",
+            "內容"
+        ]
+        ,width=4
+    )
+    comboExample.place(x=260,y=70)
+    lobby_keyword_entry=tk.Entry(window,width=20,textvariable=lobby_keyword)
+    lobby_keyword_entry.place(x=320,y=73)
+    lobby_keyword_bt=tk.Button(window,text="搜尋",command=searchkeyword)
+    lobby_keyword_bt.place(x=480,y=70)
 
     loadmission()  #載入任務
     # setmissionlist()
@@ -816,6 +847,7 @@ def setuserentrylayout(): # 設置登入介面
     entry_title_img=tk.PhotoImage(file="image/titleimage.png")
     entry_canvas.create_image(300,150,image=entry_title_img)
 
+
     usrnameimg=tk.PhotoImage(file="image/userimg.png")
     entry_canvas.create_image(128,345,image=usrnameimg)
     usrpassimg=tk.PhotoImage(file="image/passimg.png")
@@ -925,6 +957,11 @@ missionframe2=tk.Frame()
 missionlist=tk.Listbox()
 missionbar=tk.Scrollbar()
 missioncanvas=tk.Canvas()
+
+comboExample = ttk.Combobox()
+lobby_keyword_entry=tk.Entry()
+lobby_keyword=tk.StringVar()
+lobby_keyword_bt=tk.Button()
 
 #發布的任務宣告
 delegate_canvas=tk.Canvas()
